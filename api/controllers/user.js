@@ -171,6 +171,87 @@ exports.user_login = (req, res, next) => {
         });
     });
 }
+exports.admin_login = (req, res, next) => {
+   
+    let email = req.body.email;
+    let password = req.body.password;
+    User.find({ email: req.body.email}, )
+    .exec()
+    .then(user => {
+        
+        if(email === "" || email == null) {
+            return res.status(409).json({
+                message: "email is required"
+            });
+        }
+        if(password === "" || password == null) {
+            return res.status(409).json({
+                message: "password is required"
+            });
+        }
+        if (user.length < 1 ){
+            return res.status(401).json({
+                message: 'Password or Email is incorrect'
+            });
+        };
+        if (user[0].status == false ){
+            return res.status(401).json({
+                message: 'You need to confirm your email'
+            });
+        };
+        if (user[0].isBlocked == true ){
+            return res.status(401).json({
+                message: 'Your account is blocked'
+            });
+        };
+        if (user[0].isAdmin == false ){
+            return res.status(401).json({
+                message: 'Your account is not admin'
+            });
+        };
+
+        
+        
+        bcrypt.compare(req.body.password, user[0].password, (err, result) => {
+            
+            if (err){
+                return res.status(401).json({
+                    message: 'Password or Email is incorrect'
+                });
+            }
+            
+            
+            
+            if (result){
+                const token = jwt.sign({
+                    email: user[0],
+                    userId: user[0]._id
+                },  
+                
+                process.env.JWT_KEY
+                );
+                return res.status(200).json({
+                    message: 'Auth successful',
+                    username: user[0].username,
+                    token: token,
+                    id : user[0]._id
+                });
+            }
+            
+            return res.status(401).json({
+                message: 'Password or Email is incorrect'
+            });
+            
+        });
+        
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({
+            error: err
+        });
+    });
+}
 
 exports.user_delete = (req, res, next) => {
     User.remove({_id: req.params.userId})
@@ -225,6 +306,7 @@ exports.reservation = async (req, res) => {
     let scanned = 0
     let parkingId = req.body.parkingId
     let parkingName = req.body.parkingName
+    let username = user.username
     let id = ObjectId()
     let qrCode = id.toString()
     let date = new Date().toISOString()
@@ -261,7 +343,7 @@ exports.reservation = async (req, res) => {
    
     }
     
-    let reservation = { id, date, arrivalTime, departureTime, scanned, parkingId, parkingName, qrCode, carNumber }
+    let reservation = { id, date, arrivalTime, departureTime, scanned, parkingId, parkingName, qrCode, carNumber, username }
     user.reservations.push(reservation)
     
     var today = new Date();
@@ -568,8 +650,12 @@ exports.get_stats_admin = async (req, res, next) => {
     let confirmed = 0
     let totalTimeSpent = 0
     let users = await User.find()
+    let parkings = await Parking.find()
     let reservations = []
     let parkingsSpent = {}
+    let parkingOccupationPercentage = {}
+    let parkingOccupation = {}
+
 
             users.forEach(user => {
                 user.reservations.forEach(reservation => {
@@ -603,20 +689,59 @@ exports.get_stats_admin = async (req, res, next) => {
             })
             reservations.forEach(reservation => {
                if(!(reservation.parkingName in parkingsSpent)){
-                   parkingsSpent[reservation.parkingName] = 0
+                   parkingsSpent[reservation.parkingName] = 2
+               }else{
+                parkingsSpent[reservation.parkingName] =  parkingsSpent[reservation.parkingName] + 2
+                   if(reservation.scanned == 2){
+                    if(reservation.departureTime != null){
+                        let regExTimeArrival = /([0-9]?[0-9]):([0-9][0-9])/;
+        let regExTimeArrArrival = regExTimeArrival.exec(reservation.arrivalTime);
+        let timeHrArrival = regExTimeArrArrival[1] * 3600 ;
+        let timeMinArrival= regExTimeArrArrival[2] * 60 ;
+        let timeMsArrival = timeHrArrival + timeMinArrival;  
+      
+      
+        let regExTimeDeparture = /([0-9]?[0-9]):([0-9][0-9])/;
+        let regExTimeArrDeparture = regExTimeDeparture.exec(reservation.departureTime);
+        let timeHrDeparture = regExTimeArrDeparture[1] * 3600 ;
+        let timeMinDeparture= regExTimeArrDeparture[2] * 60 ;
+        let timeMsDeparture = timeHrDeparture + timeMinDeparture;
+                        let value = timeMsDeparture - timeMsArrival
+                        if(value > 0){
+                            parkingsSpent[reservation.parkingName] = parkingsSpent[reservation.parkingName] + value*0.001 
+                        }
+    
+        
+                    } 
+                   }
                }  
             })
 
+            parkings.forEach(parking => {
+                if(!(parking.name in parkingOccupationPercentage)){
+                    parkingOccupationPercentage[parking.name] = (parking.totalPlace - parking.availablePlace)/parking.totalPlace*100
+                }
+             })
+
+             parkings.forEach(parking => {
+                if(!(parking.name in parkingOccupation)){
+                    parkingOccupation[parking.name] = parking.totalPlace - parking.availablePlace
+                }
+             })
+
+            
+
             console.log(parkingsSpent)
+            console.log(parkings)
+            console.log(parkingOccupationPercentage)
             
             
     counter = reservations.length
     
 
-    res.json({"numberOfReservations" : counter, "chiffreAffaireGlobal" : counter*2 + totalTimeSpent*0.001, "totalTimeSpent" : totalTimeSpent/60})
+    res.json({"chiffreAffaireParking" : parkingsSpent, "chiffreAffaireGlobal" : counter*2 + totalTimeSpent*0.001, "parkingOccupationPercentage" : parkingOccupationPercentage, "parkingOccupation" : parkingOccupation})
     
 }
-
 exports.get_stats = async (req, res, next) => {
     
     let counter
@@ -659,4 +784,71 @@ exports.get_stats = async (req, res, next) => {
 
     res.json({"numberOfReservations" : counter, "totalSpent" : counter*2 + totalTimeSpent*0.001, "totalTimeSpent" : totalTimeSpent/60})
     
+}
+
+exports.user_update_info = async (req, res, next) => {
+
+    let username = req.body.username
+    let phone = req.body.phone
+    let matricule = req.body.matricule
+
+    
+
+    let user = await User.findById(req.user.userId, {
+        _id : 1,
+        username: 1,
+        phone: 1,
+        matricule : 1
+
+    })
+    
+    if ( phone == "" || phone == null ){
+        await User.updateOne(
+            { "_id" : mongoose.Types.ObjectId(user._id)},
+            
+             { "phone": user.phone },
+             )
+    }
+    else {
+        await User.updateOne(
+            { "_id" : mongoose.Types.ObjectId(user._id)},
+            
+             { "phone": phone },
+             )
+    }
+    if ( username == "" || username == null ){
+        await User.updateOne(
+            { "_id" : mongoose.Types.ObjectId(user._id)},
+            
+             { "username": user.username },
+             )
+    }
+    else {
+        await User.updateOne(
+            { "_id" : mongoose.Types.ObjectId(user._id)},
+            
+             { "username": username },
+             )
+    }
+    if ( matricule == "" || matricule == null ){
+        await User.updateOne(
+            { "_id" : mongoose.Types.ObjectId(user._id)},
+            
+             { "matricule": user.matricule },
+             )
+    }
+    else {
+        await User.updateOne(
+            { "_id" : mongoose.Types.ObjectId(user._id)},
+            
+             { "matricule": matricule },
+             )
+    }
+    
+     return res.status(200).json(
+        "changes were made successfully"
+        
+     );
+     
+
 }

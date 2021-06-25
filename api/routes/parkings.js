@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const checkAuth = require('../middleware/check-auth');
 const ParkingsController = require('../controllers/parkings')
+const checkAdmin = require('../middleware/admin-auth');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb){
@@ -32,7 +33,7 @@ const upload = multer({
 const Parking = require("../models/parking");
 
 
-router.get('/',checkAuth, ParkingsController.parkings_get_all);
+router.get('/',checkAuth,checkAdmin, ParkingsController.parkings_get_all);
 router.post('/', checkAuth, upload.single('parkingImage'), ParkingsController.parkings_create_parking);
 
 router.get('/available',checkAuth, ParkingsController.getAvailablePlaces);

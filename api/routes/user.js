@@ -10,6 +10,8 @@ router.post('/signup',UserController.user_signup );
 router.post('/login', UserController.user_login);
 
 
+router.post('/admin/login',UserController.admin_login);
+
 
 router.get("/confirm/:confirmCode", UserController.user_verify)
 
@@ -31,10 +33,14 @@ router.get("/admin/stats", checkAuth, checkAdmin, UserController.get_stats_admin
 
 router.get("/admin/reservations", checkAuth,checkAdmin,UserController.get_all_reservations);
 
+router.put("/profile", checkAuth,UserController.user_update_info);
+
 router.put("/admin/block/:id", checkAuth,checkAdmin,UserController.block_user);
 
 router.put("/admin/activate/:id", checkAuth,checkAdmin,UserController.activate_user);
 
 router.delete('/admin/:userId', checkAuth,checkAdmin,UserController.user_delete);
+
+
 
 module.exports = router;
