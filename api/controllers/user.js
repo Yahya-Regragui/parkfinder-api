@@ -22,34 +22,34 @@ exports.user_signup = (req, res, next) => {
     .then(user => {
         if(user.length >= 1){
             return res.status(409).json({
-                message: 'Email Address Already exists!'
+                message: 'L\'adresse e-mail existe déjà!'
             });
         }
         if(username === "" || username == null) {
             return res.status(409).json({
-                message: "username is required"
+                message: "Nom d'utilisateur requis"
             });
         }
         if(email === "" || email == null) {
             return res.status(409).json({
-                message: "email is required"
+                message: "l'e-mail est requis"
             });
         }
         if(phone === "" || phone == null) {
             return res.status(409).json({
-                message: "phone is required"
+                message: "le numéro de téléphone est requis"
             });
         }
         if(password === "" || password == null) {
             return res.status(409).json({
-                message: "password is required"
+                message: "Mot de passe requis"
             });
         }
         
         
         if(confirmPassword != password || confirmPassword == null) {
             return res.status(409).json({
-                message: "passwords must match"
+                message: "le mot de passe ne correspond pas"
             });
         }
         
@@ -74,7 +74,7 @@ exports.user_signup = (req, res, next) => {
                     .then(result => {
                         console.log(result);
                         res.status(201).json({
-                            message: "User was registered successfully! Please check your email"
+                            message: "L'utilisateur a été enregistré avec succès ! Merci de consulter votre email"
                         });
                     })
                      .catch(err => {
@@ -105,27 +105,27 @@ exports.user_login = (req, res, next) => {
         
         if(email === "" || email == null) {
             return res.status(409).json({
-                message: "email is required"
+                message: "l'e-mail est requis"
             });
         }
         if(password === "" || password == null) {
             return res.status(409).json({
-                message: "password is required"
+                message: "Mot de passe requis"
             });
         }
         if (user.length < 1 ){
             return res.status(401).json({
-                message: 'Password or Email is incorrect'
+                message: "Le mot de passe ou l'e-mail est incorrect"
             });
         };
         if (user[0].status == false ){
             return res.status(401).json({
-                message: 'You need to confirm your email'
+                message: 'Vous devez confirmer votre email'
             });
         };
         if (user[0].isBlocked == true ){
             return res.status(401).json({
-                message: 'Your account is blocked'
+                message: 'Votre compte est bloqué'
             });
         };
 
@@ -135,7 +135,7 @@ exports.user_login = (req, res, next) => {
             
             if (err){
                 return res.status(401).json({
-                    message: 'Password or Email is incorrect'
+                    message:" Le mot de passe ou l'e-mail est incorrect"
                 });
             }
             
@@ -150,7 +150,7 @@ exports.user_login = (req, res, next) => {
                 process.env.JWT_KEY
                 );
                 return res.status(200).json({
-                    message: 'Auth successful',
+                    message: 'Authentification réussie',
                     username: user[0].username,
                     token: token,
                     id : user[0]._id
@@ -158,7 +158,7 @@ exports.user_login = (req, res, next) => {
             }
             
             return res.status(401).json({
-                message: 'Password or Email is incorrect'
+                message: "Le mot de passe ou l'e-mail est incorrect"
             });
             
         });
@@ -181,32 +181,32 @@ exports.admin_login = (req, res, next) => {
         
         if(email === "" || email == null) {
             return res.status(409).json({
-                message: "email is required"
+                message: "l'e-mail est requis"
             });
         }
         if(password === "" || password == null) {
             return res.status(409).json({
-                message: "password is required"
+                message: "Le mot de pass est requis"
             });
         }
         if (user.length < 1 ){
             return res.status(401).json({
-                message: 'Password or Email is incorrect'
+                message: "Le mot de passe ou l'e-mail est incorrect"
             });
         };
         if (user[0].status == false ){
             return res.status(401).json({
-                message: 'You need to confirm your email'
+                message: 'Vous devez confirmer votre email'
             });
         };
         if (user[0].isBlocked == true ){
             return res.status(401).json({
-                message: 'Your account is blocked'
+                message: 'Votre compte est bloqué'
             });
         };
         if (user[0].isAdmin == false ){
             return res.status(401).json({
-                message: 'Your account is not admin'
+                message: "Votre compte n'est pas administrateur"
             });
         };
 
@@ -216,7 +216,7 @@ exports.admin_login = (req, res, next) => {
             
             if (err){
                 return res.status(401).json({
-                    message: 'Password or Email is incorrect'
+                    message: "Le mot de passe ou l'e-mail est incorrect"
                 });
             }
             
@@ -231,7 +231,7 @@ exports.admin_login = (req, res, next) => {
                 process.env.JWT_KEY
                 );
                 return res.status(200).json({
-                    message: 'Auth successful',
+                    message: 'Authentification réussie',
                     username: user[0].username,
                     token: token,
                     id : user[0]._id
@@ -239,7 +239,7 @@ exports.admin_login = (req, res, next) => {
             }
             
             return res.status(401).json({
-                message: 'Password or Email is incorrect'
+                message: "Le mot de passe ou l'e-mail est incorrect"
             });
             
         });
@@ -258,7 +258,7 @@ exports.user_delete = (req, res, next) => {
     .exec()
     .then(result => {
         res.status(200).json({
-            message: 'User deleted'
+            message: 'Utilisateur supprimé'
         });
     })
     .catch(err => {
@@ -275,7 +275,7 @@ exports.user_verify = (req, res, next) => {
     })
       .then((user) => {
         if (!user) {
-          return res.status(404).send({ message: "User Not found." });
+          return res.status(404).send({ message: "Utilisateur non trouvé." });
         }
   
         user.status = true;
@@ -312,13 +312,13 @@ exports.reservation = async (req, res) => {
     let date = new Date().toISOString()
     let carNumber = req.body.carNumber
     if(arrivalTime === "" || arrivalTime == 'null'){
-        return res.status(400).json({ message: "Arrival time is required"})
+        return res.status(400).json({ message: "L'heure d'arrivée est requise"})
       }
     if(parkingId === "" || parkingId == null){
-        return res.status(400).json({ message: "parkingId is required"})
+        return res.status(400).json({ message: "ParkingId est requis"})
       }
     if(carNumber === "" || carNumber == null){
-        return res.status(400).json({ message: "carNumber is required"})
+        return res.status(400).json({ message: "Le numéro de voiture est requis"})
       }
       
     // Save user receipt
@@ -362,21 +362,21 @@ exports.reservation = async (req, res) => {
       
    )
     if(user.sold < 0){
-      return res.status(400).json({ message: "Please Recharge Account"})
+      return res.status(400).json({ message: "Veuillez recharger votre compte"})
     }
     
   
     if(placeAvailable.reservedPlace == placeAvailable.totalPlace || placeAvailable.availablePlace == 0){
-      return res.status(400).json({ message: "All places have been reserved"})
+      return res.status(400).json({ message: "Toutes les places ont été réservées"})
     }
     
     if(departureTime != null){
     if(timeMsArrival > timeMsDeparture){
-      return res.status(400).json({ message: "Departure must be after arrival"})
+      return res.status(400).json({ message: "Le départ doit être après l'arrivée"})
     }
   }
     if(timeMsArrival < timeMsToday || timeMsArrival > timeMsToday + 3600){
-      return res.status(400).json({ message: "You can reserve only one hour in advance"})
+      return res.status(400).json({ message: "Vous ne pouvez réserver qu'une heure à l'avance"})
     }
   
     
@@ -391,7 +391,7 @@ exports.reservation = async (req, res) => {
    )
    
   
-    return res.status(200).json({ message: "Reservation successful", id })
+    return res.status(200).json({ message: "Réservation réussie", id })
   }
   }
 
@@ -423,9 +423,9 @@ exports.getQr = async (req, res) => {
     timeMsDeparture = timeHrDeparture + timeMinDeparture;
     }
     if (db_product == null || db_product.reservations[0]['scanned'] >= 2) {
-        return res.status(400).json({ message: "Invalid QR Code" })
+        return res.status(400).json({ message: "Code QR invalide" })
       }if(timeMsArrival > timeMsToday + 900 || timeMsArrival < timeMsToday - 900){
-        return res.status(400).json({ message: "Not Valid Time" })
+        return res.status(400).json({ message: "Heure non valide" })
       }
       else{
 
@@ -446,11 +446,11 @@ exports.getQr = async (req, res) => {
         departureTime = db_product.reservations[0]['departureTime'] ? timeMsDeparture: timeMsToday;
         
         if(timeMsDeparture < timeMsToday + 600){
-          return res.status(400).json({ message: "Time exceeded" })
+          return res.status(400).json({ message: "Temps écoulé" })
         }
         let spentTime = (departureTime - timeMsArrival) * 0.001
         if(spentTime > db_product.sold){
-          return res.status(400).json({ message: "Not enough sold Please recharge account" })
+          return res.status(400).json({ message: "Solde insuffisant Veuillez recharger le compte" })
         }
         
         if(spentTime > 0){
@@ -478,9 +478,9 @@ exports.getQr = async (req, res) => {
      
       }
       if(db_product.reservations[0]['scanned'] == 0){
-        return res.status(200).json({ message: "Welcome to the parking" })
+        return res.status(200).json({ message: "Bienvenue au parking" })
       }else{
-        return res.status(200).json({ message: "See you next time" })
+        return res.status(200).json({ message: "À la prochaine!" })
       }
       
     }
@@ -532,7 +532,7 @@ exports.updateSold = async (req, res) => {
     }
  )
   return res.status(200).json({
-                   message : "your sold was successfully charged"
+                   message : "votre solde a été rechargé avec succès"
   });
 
   }
@@ -605,7 +605,7 @@ exports.block_user= async (req, res, next) => {
     })
     if (user.isBlocked == true){
         return res.status(400).json(
-            user.username + " is already blocked"
+            user.username + " est déjà bloqué"
          );
     }
     await User.updateOne(
@@ -616,7 +616,7 @@ exports.block_user= async (req, res, next) => {
      )
 
     return res.status(200).json(
-        user.username + " is blocked"
+        user.username + " est bloqué"
      );
 
 }
@@ -628,7 +628,7 @@ exports.activate_user= async (req, res, next) => {
     })
     if (user.isBlocked == false){
         return res.status(400).json(
-            user.username + " is already active"
+            user.username + " est déjà actif"
          );
     }
     await User.updateOne(
@@ -639,7 +639,7 @@ exports.activate_user= async (req, res, next) => {
      )
 
     return res.status(200).json(
-        user.username + " is activated"
+        user.username + " est activé"
      );
 
 }
@@ -846,9 +846,47 @@ exports.user_update_info = async (req, res, next) => {
     }
     
      return res.status(200).json(
-        "changes were made successfully"
+        "les modifications ont été effectuées avec succès"
         
      );
      
 
 }
+
+exports.getAvailablePlaces = async (req, res) => {
+    try{
+    const response = await axios.get('http://192.168.137.2:80')
+      console.log(response.data);
+      await Parking.updateOne(
+        { "_id" : mongoose.Types.ObjectId("60cc62b6105ed4352086a361")},
+        {
+          $set: { "availablePlace": response.data.detection},
+        }
+     )
+     return res.status(200).json(response.data)
+    }catch{
+        return res.status(400).json({detection : "IOT introuvable"})
+    }
+        
+}
+
+exports.getReservationAll = async (req, res) => {
+
+    let user = await User.findById(req.user.userId,{
+      reservations: 1,
+      username: 1,
+      email: 1,
+      isBlocked: 1,
+      sold : 1
+  })
+  
+  const sortedReservations = user.reservations.sort(function(a,b){
+    return new Date(b.date) - new Date(a.date);
+  });
+
+  return res.status(200).json(
+                
+                   sortedReservations
+                )
+
+  }

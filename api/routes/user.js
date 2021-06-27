@@ -41,6 +41,9 @@ router.put("/admin/activate/:id", checkAuth,checkAdmin,UserController.activate_u
 
 router.delete('/admin/:userId', checkAuth,checkAdmin,UserController.user_delete);
 
+router.get("/reservationsall",checkAuth, UserController.getReservationAll);
+
+
 
 
 module.exports = router;

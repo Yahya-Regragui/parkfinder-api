@@ -60,27 +60,27 @@ exports.parkings_create_parking = (req, res, next)=> {
     let totalPlace = req.body.totalPlace
     if (name === "" || name == null){
         return res.status(401).json({
-            message: 'parking name is required'
+            message: 'le nom du parking est requis'
         });
     } 
     if (location_x === "" || location_x == null){
         return res.status(401).json({
-            message: 'parking location_x is required'
+            message: 'parking location_x est requis'
         });
     } 
     if (location_y === "" || location_y == null){
         return res.status(401).json({
-            message: 'parking location_y is required'
+            message: 'parking location_y est requis'
         });
     } 
     if (description === "" || description == null){
         return res.status(401).json({
-            message: 'parking description is required'
+            message: 'la description du parking est requise'
         });
     } 
     if (totalPlace === "" || totalPlace == null){
         return res.status(401).json({
-            message: 'parking totalPlace is required'
+            message: 'parking totalPlace est requis'
         });
     } 
     const parking = new Parking({
@@ -97,7 +97,7 @@ exports.parkings_create_parking = (req, res, next)=> {
         .then(result => {
             console.log(result);
             res.status(201).json({
-                message: 'Created parking successfully !',
+                message: 'Parking créé avec succès !',
                 createdParking: {
                     name: result.name,
                     location_x: result.location_x,
@@ -155,27 +155,27 @@ exports.parkings_update_parking = async (req, res, next)=> {
     let totalPlace = req.body.totalPlace
     if (name === "" || name == null){
         return res.status(401).json({
-            message: 'parking name is required'
+            message: 'le nom du parking est requis'
         });
     } 
     if (location_x === "" || location_x == null){
         return res.status(401).json({
-            message: 'parking location_x is required'
+            message: 'parking location_x est requis'
         });
     } 
     if (location_y === "" || location_y == null){
         return res.status(401).json({
-            message: 'parking location_y is required'
+            message: 'parking location_y est requis'
         });
     } 
     if (description === "" || description == null){
         return res.status(401).json({
-            message: 'parking description is required'
+            message: 'la description du parking est requise'
         });
     } 
     if (totalPlace === "" || totalPlace == null){
         return res.status(401).json({
-            message: 'parking totalPlace is required'
+            message: 'parking totalPlace est requis'
         });
     } 
     let userData = {
@@ -193,7 +193,7 @@ exports.parkings_update_parking = async (req, res, next)=> {
     .then( result => {
      console.log(result);
      res.status(200).json({
-         message: 'Parking Updated',
+         message: 'Parking mis à jour',
          
      });
     })
@@ -212,7 +212,7 @@ exports.parkings_update_parking = async (req, res, next)=> {
      .exec()
      .then(result => {
          res.status(200).json({
-             message: 'Parking deleted',
+             message: 'Parking supprimé',
              
          });
      })
