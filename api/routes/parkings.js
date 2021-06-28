@@ -33,8 +33,8 @@ const upload = multer({
 const Parking = require("../models/parking");
 
 
-router.get('/',checkAuth,checkAdmin, ParkingsController.parkings_get_all);
-router.post('/', checkAuth, upload.single('parkingImage'), ParkingsController.parkings_create_parking);
+router.get('/',checkAuth, ParkingsController.parkings_get_all);
+router.post('/', checkAuth,checkAdmin, upload.single('parkingImage'), ParkingsController.parkings_create_parking);
 
 router.get('/available',checkAuth, ParkingsController.getAvailablePlaces);
 
