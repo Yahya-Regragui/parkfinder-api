@@ -31,7 +31,8 @@ const parkingSchema = mongoose.Schema({
         default: 0
     },
     availablePlace: {
-        type: Number
+        type: Number,
+        default: 50
     }
 });
 
