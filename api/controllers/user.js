@@ -320,6 +320,9 @@ exports.reservation = async (req, res) => {
     if(carNumber === "" || carNumber == null){
         return res.status(400).json({ message: "Le numéro de voiture est requis"})
       }
+    if(user.isBlocked){
+        return res.status(400).json({ message: "Votre compte est bloqué, veuillez contacter un administrateur"})
+      }
       
     // Save user receipt
     let regExTimeArrival = /([0-9]?[0-9]):([0-9][0-9])/;
